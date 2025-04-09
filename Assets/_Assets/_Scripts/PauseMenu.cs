@@ -1,24 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
-    [Header("Pause Menu")]
-    [Tooltip("Das UI-Panel, das das Pause-Menu darstellt.")]
+    [Header("Pause Menu Settings")]
+    [Tooltip("The UI panel representing the pause menu.")]
     public GameObject pauseMenuUI;
 
-    [Header("Kamera & Steuerung")]
-    [Tooltip("Das Kamerasteuerungs-Skript, das deaktiviert werden soll.")]
-    public MonoBehaviour cameraController; // Beispiel: CameraController, PlayerController, etc.
+    [Header("Camera & Controls")]
+    [Tooltip("The camera or player controller script that should be disabled when paused.")]
+    public MonoBehaviour cameraController;
+
+    [Header("Scene Settings")]
+    [Tooltip("The name of the scene to load when returning to the menu.")]
+    [SerializeField] private string menuSceneName = "MainMenu"; // Set the scene in the Inspector
 
     private bool isPaused = false;
 
     private void Update()
     {
-        // Wurde Escape-Taste gedrückt?
-        if (Input.GetKeyDown(KeyCode.M))
+        // Check if the M key is pressed to toggle the pause menu
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (isPaused)
             {
@@ -33,50 +35,60 @@ public class PauseMenu : MonoBehaviour
 
     public void Endgame()
     {
-        Debug.Log("GameOver");
+        Debug.Log("Game Over");
     }
 
     private void PauseGame()
     {
-        pauseMenuUI.SetActive(true); // Pause-Menü anzeigen
-        Time.timeScale = 0f;         // Spielzeit pausieren
+        pauseMenuUI.SetActive(true); // Show pause menu
+        Time.timeScale = 0f;         // Pause the game time
         isPaused = true;
 
-        // Cursor aktivieren & sichtbar machen
+        // Unlock and show the cursor
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        // Kamerasteuerung deaktivieren
+        // Disable camera or player control
         if (cameraController != null)
         {
             cameraController.enabled = false;
         }
 
-        Debug.Log("Spiel pausiert.");
+        Debug.Log("Game paused.");
     }
 
     public void ResumeGame()
     {
-        pauseMenuUI.SetActive(false); // Pause-Menü ausblenden
-        Time.timeScale = 1f;          // Spielzeit fortsetzen
+        pauseMenuUI.SetActive(false); // Hide pause menu
+        Time.timeScale = 1f;          // Resume game time
         isPaused = false;
 
-        // Cursor deaktivieren & sperren
+        // Lock and hide the cursor
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        // Kamerasteuerung wieder aktivieren
+        // Enable camera or player control
         if (cameraController != null)
         {
             cameraController.enabled = true;
         }
 
-        Debug.Log("Spiel fortgesetzt.");
+        Debug.Log("Game resumed.");
     }
+
     public void RestartGame()
     {
-        Time.timeScale = 1f; // Wichtiger Fix: Stelle sicher, dass die Zeit nicht auf 0 bleibt!
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // Lädt die aktuelle Szene neu
-        Debug.Log("Szene wird neugestartet.");
+        Time.timeScale = 1f; // Ensure time is running
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // Reload current scene
+        Debug.Log("Scene restarted.");
+    }
+
+    // Return to Menu with Scene Selection
+    public void BackToMenu()
+    {
+        Time.timeScale = 1f; // Ensure the game is not paused when switching scenes
+        SceneManager.LoadScene("Main Menu"); // Load the scene
+        Debug.Log("Back to Menu"); 
+
     }
 }
